@@ -13,8 +13,8 @@ Put the script inside the folder where the .ass files are.<br>
 Launch the script and follow the steps. Everything is explained.<br>
 Done !
 
-### Recommended
-Put the script in the path to use it anywhere
+<!-- ### Recommended -->
+<!-- Put the script in the path to use it anywhere -->
 
 ## Known Issue
 Fonts collection (.ttc) with languages other than English as the default language can cause problems. <br>

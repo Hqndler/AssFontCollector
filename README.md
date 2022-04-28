@@ -4,8 +4,8 @@ Personal python solution to extract used font in one or more .ass file.
 
 ## Usage
 
-Put the script inside the folder where the .ass files are.
-Launch the script and follow the steps. Everything is explained.
+Put the script inside the folder where the .ass files are.<br>
+Launch the script and follow the steps. Everything is explained.<br>
 Done !
 
 ### Recommended

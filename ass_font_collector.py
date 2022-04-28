@@ -19,7 +19,6 @@ def buffer_ass(ass_list):
     print(r"100% .ass file treated")
     return finale
 
-
 def fontname_ass(file):
     dialogues, comments, styles, ignore, finale = [], [], [], [], []
     fonts, assoc = dict(), dict()
@@ -289,7 +288,6 @@ def make(mode):
                         except:
                             pass
                             # print(f"Une variante grasse-italique de {used_font} a été détectée mais n'a pas été trouvée.")
-                            # je dois vérifier que la clé demandée existe avant de la copier
                 if len(d[used_font]) > 1:
                     if "Regular" in d[used_font]:
                         try:

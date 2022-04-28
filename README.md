@@ -2,6 +2,11 @@
 
 Personal python solution to extract used font in one or more .ass file.
 
+## Requirement 
+```
+pip install fontTools tox
+```
+
 ## Usage
 
 Put the script inside the folder where the .ass files are.<br>

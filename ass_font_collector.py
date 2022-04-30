@@ -2,21 +2,18 @@ import glob, os, shutil, re, time
 from contextlib import redirect_stderr
 from fontTools import ttLib
 
-cwd = os.getcwd()
-d = dict()
 WARNING = True #True if you want the warning message
 
 def buffer_ass(ass_list):
     finale = fontname_ass(ass_list[0])
-    half_ass_list_len = round(len(ass_list) / 2, 0)
+    d_p_a.append(list(finale))
     ass_list.pop(0)
     if ass_list:
-        for file,c in enumerate(ass_list):
+        for c,file in enumerate(ass_list):
             add = fontname_ass(file)
-            if (c % half_ass_list_len) == 0:
-                print(r"50% .ass file treated")
+            d_p_a.append(list(add))
             finale = set_dict(finale, add)
-    print(r"100% .ass file treated")
+    print("Parsing done for all .ass.\n")
     return finale
 
 def fontname_ass(file):
@@ -146,23 +143,21 @@ def set_dict(fonts, finale):
     return finale
 
 def filtre(fonts):
-    z = 0
-    print("Start processing...")
+    print("Start font checking...")
+    start = time.time()
     fonts_len = len(fonts)
-    un_zero = 300
-    if fonts_len > 3000:
-        un_zero = un_zero * 10
-    for font_path,c in enumerate(fonts):
+    for c,font_path in enumerate(fonts):
         if ".ttc" in font_path.lower():
             for i in range(1,5): #assume there's less than 6 fonts in the font collection
                 try:
-                    font_name(font_path, z + i)
+                    font_name(font_path, 0 + i)
                 except:
                     break
-        font_name(font_path, z)
-        if (c % un_zero) == 0:
-            print(f"{c} fonts treated.")
-    print(f"{fonts_len}/{fonts_len} fonts treated.")
+        font_name(font_path, 0)
+        if (c % int(round(fonts_len/5,0)+1) ) == 0 and c != 0:
+            print(f"{c}/{fonts_len} fonts checked.")
+    end = time.time()
+    print(f"{fonts_len}/{fonts_len} fonts checked in {round(end-start,2)}s\n")
 
 def font_name(font_path,z):
 
@@ -237,6 +232,16 @@ def grab_fonts():
     installed_fonts = local + windows_fonts
     return installed_fonts
 
+def problem(font):
+    ass_list = glob.glob("*.ass")
+    print(f"{font} found in ", end='')
+    for c,ass_dict in enumerate(d_p_a):
+        if font in ass_dict:
+            ass = ass_list[c].replace(os.path.dirname(ass_list[c]), "")
+            print(f"{ass} ", end='')
+    print("")
+
+
 def isEnglish(s):
     try:
         s.encode(encoding='utf-8').decode('ascii')
@@ -260,6 +265,7 @@ def make(mode):
                     print(f"{used_font} found but no corresponding font installed")
                 if not isEnglish(used_font):
                     print(f"Sorry but {used_font} is not a font name that can be used by the script. Sorry for the inconvenience.")
+                problem(used_font)
 
     if mode == "copy" and ass_fonts:
         for used_font in ass_fonts:
@@ -288,6 +294,7 @@ def make(mode):
                         except:
                             pass
                             # print(f"Une variante grasse-italique de {used_font} a été détectée mais n'a pas été trouvée.")
+                            # je dois vérifier que la clé demandée existe avant de la copier
                 if len(d[used_font]) > 1:
                     if "Regular" in d[used_font]:
                         try:
@@ -312,11 +319,15 @@ def make(mode):
                     print(f"{used_font} found but no corresponding font installed")
                 if not isEnglish(used_font):
                     print(f"Sorry but {used_font} is not a font name that can be used by the script. Sorry for the inconvenience.")
+                problem(used_font)
     
     if not ass_fonts:
         print("No .ass file found.")
 
 if __name__ == "__main__":
+    cwd = os.getcwd()
+    d = dict()
+    d_p_a = list()
     print("Font collector made in Handler. Just write what's inside the brackets.")
     rep = int(input("[1] Check - [2] Copy : "))
     if rep == 1:

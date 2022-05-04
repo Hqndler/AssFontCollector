@@ -211,21 +211,23 @@ def font_name(font_path,z):
             d[family][style] = font_path
         else:
             if WARNING:
-                print(f"\t Seems like {font_path} don't have all the information I need.")
-                print(f"""\t If you know you used this font, run this command : copy "{font_path}" "{cwd}" \n""")
+                print(Fore.RED + f"Seems like {font_path} don't have all the information I need.")
+                print(f"""If you know you used this font, run this command : copy "{font_path}" "{cwd}" """)
+                print(Style.RESET_ALL)
             return 0
     
     else:
         if WARNING:
-            print("\t There is definitly no langID 1033 (English) in this font, ", end="")
+            print(Fore.RED + "There is definitly no langID 1033 (English) in this font, ", end="")
             previous = ""
             for x in names:
                 if x.langID != previous and x.langID >= 1000:
                     previous = x.langID
                     print(f"{x.langID} ", end='')
             print(f"langID in {font_path}, sorry but this/these langID seems to cause problems.")
-            print("\t More information here about langID -> https://docs.microsoft.com/en-us/windows/win32/msi/localizing-the-error-and-actiontext-tables")
-            print(f"""\t If you know you used this font, run this command : copy "{font_path}" "{cwd}" \n""")
+            print("More information here about langID -> https://docs.microsoft.com/en-us/windows/win32/msi/localizing-the-error-and-actiontext-tables")
+            print(f"""If you know you used this font, run this command : copy "{font_path}" "{cwd}" """)
+            print(Style.RESET_ALL)
         return 0
 
 def grab_fonts():

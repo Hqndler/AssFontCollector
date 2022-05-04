@@ -1,7 +1,10 @@
 import glob, os, shutil, re, time
+from lib2to3.pytree import convert
 from contextlib import redirect_stderr
 from fontTools import ttLib
+from colorama import init, Fore, Style
 
+init(convert=True)
 WARNING = True #True if you want the warning message
 
 def buffer_ass(ass_list):
@@ -13,7 +16,8 @@ def buffer_ass(ass_list):
             add = fontname_ass(file)
             d_p_a.append(list(add))
             finale = set_dict(finale, add)
-    print("Parsing done for all .ass.\n")
+    print(Fore.GREEN + "Parsing done for all .ass.")
+    print(Style.RESET_ALL)
     return finale
 
 def fontname_ass(file):
@@ -143,7 +147,7 @@ def set_dict(fonts, finale):
     return finale
 
 def filtre(fonts):
-    print("Start font checking...")
+    print(Fore.YELLOW + "Start font checking...")
     start = time.time()
     fonts_len = len(fonts)
     for c,font_path in enumerate(fonts):
@@ -157,7 +161,8 @@ def filtre(fonts):
         if (c % int(round(fonts_len/5,0)+1) ) == 0 and c != 0:
             print(f"{c}/{fonts_len} fonts checked.")
     end = time.time()
-    print(f"{fonts_len}/{fonts_len} fonts checked in {round(end-start,2)}s\n")
+    print(Fore.GREEN + f"{fonts_len}/{fonts_len} fonts checked in {round(end-start,2)}s")
+    print(Style.RESET_ALL)
 
 def font_name(font_path,z):
 
@@ -234,12 +239,16 @@ def grab_fonts():
 
 def problem(font):
     ass_list = glob.glob("*.ass")
-    print(f"{font} found in ", end='')
+    print(Fore.MAGENTA + f"{font} found in ", end='')
     for c,ass_dict in enumerate(d_p_a):
         if font in ass_dict:
             ass = ass_list[c].replace(os.path.dirname(ass_list[c]), "")
-            print(f"{ass} ", end='')
-    print("")
+            print(f"{ass}, ", end='')
+    if isEnglish(font):
+        print("but no corresponding font installed", end='')
+    if not isEnglish(font):
+        print("and it is not a font name that can be used by the script. Sorry for the inconvenience.", end='')
+    print(Style.RESET_ALL)
 
 
 def isEnglish(s):
@@ -261,10 +270,6 @@ def make(mode):
             if used_font in d:
                 print(f"{used_font} installed.")
             else:
-                if isEnglish(used_font):
-                    print(f"{used_font} found but no corresponding font installed")
-                if not isEnglish(used_font):
-                    print(f"Sorry but {used_font} is not a font name that can be used by the script. Sorry for the inconvenience.")
                 problem(used_font)
 
     if mode == "copy" and ass_fonts:
@@ -294,7 +299,7 @@ def make(mode):
                         except:
                             pass
                             # print(f"Une variante grasse-italique de {used_font} a été détectée mais n'a pas été trouvée.")
-                            
+                            # je dois vérifier que la clé demandée existe avant de la copier
                 if len(d[used_font]) > 1:
                     if "Regular" in d[used_font]:
                         try:
@@ -315,10 +320,6 @@ def make(mode):
                     except:
                         pass
             if used_font not in d:
-                if isEnglish(used_font):
-                    print(f"{used_font} found but no corresponding font installed")
-                if not isEnglish(used_font):
-                    print(f"Sorry but {used_font} is not a font name that can be used by the script. Sorry for the inconvenience.")
                 problem(used_font)
     
     if not ass_fonts:

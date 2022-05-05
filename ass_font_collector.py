@@ -1,5 +1,4 @@
 import glob, os, shutil, re, time
-from lib2to3.pytree import convert
 from contextlib import redirect_stderr
 from fontTools import ttLib
 from colorama import init, Fore, Style
@@ -12,7 +11,7 @@ def buffer_ass(ass_list):
     d_p_a.append(list(finale))
     ass_list.pop(0)
     if ass_list:
-        for c,file in enumerate(ass_list):
+        for file in ass_list:
             add = fontname_ass(file)
             d_p_a.append(list(add))
             finale = set_dict(finale, add)
@@ -76,9 +75,12 @@ def fontname_ass(file):
                 if "\\i1" in l:
                     if assoc[tmp[3]][list(assoc[tmp[3]])[0]]['Italic'] == False:
                         assoc[tmp[3]][list(assoc[tmp[3]])[0]]['Italic'] = True
-            if not font and (not "\\p1" in l or "\\p2" in l or "\\p3" in l or "\\p4" in l): #support goes only to p4 but who uses p4 anyway ?
-                dialogues.append(tmp[3])
-            if "\\p1" in l or "\\p2" in l or "\\p3" in l or "\\p4" in l:
+            if not font and not ("\\p1" in l or "\\p2" in l or "\\p3" in l or "\\p4" in l): #support goes only to p4 but who uses p4 anyway ? and yeah I should've use regex pattern 
+                if tmp[9]:
+                    dialogues.append(tmp[3])
+                if not tmp[9]:
+                    comments.append(tmp[3])
+            if "\\p1" in l or "\\p2" in l or "\\p3" in l or "\\p4" in l: #regex where ?????
                 comments.append(tmp[3])
         elif 'Comment:' in l:
             tmp = l.split(',')[3]
@@ -178,37 +180,29 @@ def font_name(font_path,z):
             except UnicodeDecodeError:
                 details[x.nameID] = x.string.decode(errors = 'ignore')
 
-    if not details:
+    if not details: #occure only with no info in english, for very specific font
         try:
             details[x.nameID] = x.toUnicode()
         except UnicodeDecodeError:
             details[x.nameID] = x.string.decode(errors = 'ignore')
 
-    check = False
-
     if details:
 
-        if 1 in details and 2 in details and 4 in details: 
+        if 1 in details and 2 in details: 
 
-            if '.otf' in font_path.lower():
-                family, style = details[1].strip() , details[2]
-                check = True
+            family, style = details[1].strip()[:31], details[2]
 
-            elif '.ttc' in font_path.lower():
-                # oui je sais c'est là même chose qu'au dessus
-                family, style = details[1].strip(), details[2]
-                check = True
-
-            elif '.ttf' in font_path.lower():
-                if details[2] in details[4]:
-                    family, style = details[1].strip(), details[2]
-                else:
-                    family, style = details[4].strip(), details[2]
-                check = True
-
-            if check and family not in d:
+            if family not in d:
                 d[family] = dict()
             d[family][style] = font_path
+            return 0
+
+        if (1 in details) and (not 2 in details):
+            if details[1] not in d:
+                d[details[1].stip()[:31]] = dict()
+            d[details[1]]["Regular"] = font_path
+            return 0
+
         else:
             if WARNING:
                 print(Fore.RED + f"Seems like {font_path} don't have all the information I need.")
@@ -216,18 +210,17 @@ def font_name(font_path,z):
                 print(Style.RESET_ALL)
             return 0
     
-    else:
-        if WARNING:
-            print(Fore.RED + "There is definitly no langID 1033 (English) in this font, ", end="")
-            previous = ""
-            for x in names:
-                if x.langID != previous and x.langID >= 1000:
-                    previous = x.langID
-                    print(f"{x.langID} ", end='')
-            print(f"langID in {font_path}, sorry but this/these langID seems to cause problems.")
-            print("More information here about langID -> https://docs.microsoft.com/en-us/windows/win32/msi/localizing-the-error-and-actiontext-tables")
-            print(f"""If you know you used this font, run this command : copy "{font_path}" "{cwd}" """)
-            print(Style.RESET_ALL)
+    if not details and WARNING: #should never occure but I don't want to delete this part lol
+        print(Fore.RED + "There is definitly no langID 1033 (English) in this font, ", end="")
+        previous = ""
+        for x in names:
+            if x.langID != previous and x.langID >= 1000:
+                previous = x.langID
+                print(f"{x.langID} ", end='')
+        print(f"langID in {font_path}, sorry but this/these langID seems to cause problems.")
+        print("More information here about langID -> https://docs.microsoft.com/en-us/windows/win32/msi/localizing-the-error-and-actiontext-tables")
+        print(f"""If you know you used this font, run this command : copy "{font_path}" "{cwd}" """)
+        print(Style.RESET_ALL)
         return 0
 
 def grab_fonts():
@@ -345,3 +338,4 @@ if __name__ == "__main__":
                 make("copy") 
             else:
                 print("Sorry, I did'nt anderstand, can you retry ? (Reminder only Enter key is recognized)")
+    input()

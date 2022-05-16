@@ -1,4 +1,4 @@
-import glob, os, shutil, re, time
+import glob, os, shutil, re, time, sys
 from contextlib import redirect_stderr
 from fontTools import ttLib
 from colorama import init, Fore, Style
@@ -26,6 +26,7 @@ def fontname_ass(file):
     readFile = open(file, 'r', encoding='utf-8')
     lines = readFile.readlines()
     for line in lines:
+        print(line)
         l = line.strip()
         if 'Style: ' in l:
             if "WrapStyle:" in l:
@@ -53,6 +54,7 @@ def fontname_ass(file):
                             fonts[font]["Italic"] = assoc[tmp[3]][list(assoc[tmp[3]])[0]]['Italic']
 
                     if font and ("\\b1" in elem or "\\i1" in elem or "\\b0" in elem or "\\i0" in elem):
+                        bold_status, italic_status = assoc[tmp[3]][list(assoc[tmp[3]])[0]]['Bold'], assoc[tmp[3]][list(assoc[tmp[3]])[0]]['Italic']
                         if "\\b1" in elem:
                             bold_status = True
                         if "\\i1" in elem:
@@ -63,11 +65,11 @@ def fontname_ass(file):
                             italic_status = False
 
                         if font in fonts:
-                            if fonts[font]["Bold"] == False:
+                            if fonts[font]["Bold"] == False and bold_status:
                                 fonts[font]["Bold"] = bold_status
 
-                            if fonts[font]["Italic"] == False:
-                                fonts[font]["Italic"] = italic_status
+                            if fonts[font]["Italic"] == False and italic_status:
+                                    fonts[font]["Italic"] = italic_status
             if ("\\b1" in l or "\\i1" in l) and ("\\fn" not in l):
                 if "\\b1" in l:
                     if assoc[tmp[3]][list(assoc[tmp[3]])[0]]['Bold'] == False:
@@ -103,7 +105,6 @@ def fontname_ass(file):
 
     finale = set_list(finale)
     finale = set_dict(fonts, finale)
-    # print(finale)
     return finale
 
 def make_assoc(styles):

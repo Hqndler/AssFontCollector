@@ -3,6 +3,8 @@
 Personal python solution to extract used font in one or more .ass file.
 
 ## Requirement 
+
+Python 3.6+ 
 ```
 pip install fontTools tox colorama
 ```

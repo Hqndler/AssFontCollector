@@ -3,6 +3,7 @@
 Solution personnel pour extraire des polices utilisée dans un ou plusieurs fichier ass.
 
 ## Avant toute chose assurez vous de bien tout mettre à jour !
+Python 3.6 ou supérieur
 ```
 pip install fontTools tox colorama ass ass_tag_parser
 ```

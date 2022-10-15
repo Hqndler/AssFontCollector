@@ -1,7 +1,7 @@
 # Ass Font Collector
 
 [French README](https://github.com/Hqndler/AssFontCollector/blob/main/README.fr.md)<br><br>
-Personal python solution to extract used font in one or more .ass file.
+Personal python solution to extract used font in one or more ass file.
 
 ## Requirement 
 
@@ -12,7 +12,7 @@ pip install fontTools tox colorama ass ass_tag_parser
 
 ## Usage
 
-Put the script inside the folder where the .ass files are.<br>
+Put the script inside the folder where the ass files are.<br>
 Make sure there's only the ass files you want to extract the fonts.<br>
 Launch the script in the terminal and follow the steps. Everything is explained.<br>
 Done !

@@ -19,9 +19,10 @@ Done !
 ## Things to know
 
 You can edit the line 10 and 11.<br>
-Line 10 : WARNING = True -> will print warnings everytime there's a problem, False to deseable the warnings.<br>
-Line 11 : ALL_IN_ONE = False -> will copy all the fonts used in each of the ass files, in folders with the same name as the files (without the extension).<br>
-ALL_IN_ONE = True -> will copy all the fonts used in each of the ass files within the same folder.
+Line 10 : `WARNING = True` -> will print warnings everytime there's a problem, `False` to deseable the warnings.<br>
+Line 11 : `ALL_IN_ONE = False` -> will copy all the fonts used in each of the ass files, in folders with the same name as the files (without the extension).<br>
+![Proof](https://github.com/Hqndler/AssFontCollector/blob/main/Output%20proof%20for%20ALL_IN_ONE%20False.png)<br>
+`ALL_IN_ONE = True` -> will copy all the fonts used in each of the ass files within the same folder.
 
 <!-- ### Recommended -->
 <!-- Put the script in the path to use it anywhere -->

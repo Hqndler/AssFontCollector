@@ -2,7 +2,7 @@
 
 Solution personnel pour extraire des polices utilisée dans un ou plusieurs fichier ass.
 
-## Avant toute chose assurez vous de bien tout à jour !
+## Avant toute chose assurez vous de bien tout mettre à jour !
 ```
 pip install fontTools tox colorama ass ass_tag_parser
 ```
@@ -21,4 +21,4 @@ Fini !
 - Ligne 11 : `ALL_IN_ONE = False` -> copiera toutes les polices utilisée dans chacun des ass, dans des dossiers avec le même nom que le fichier ass (sans l'extension).<br>
 ![Une image vaut plus que mille mots](https://github.com/Hqndler/AssFontCollector/blob/main/Output%20proof%20for%20ALL_IN_ONE%20False.png)<br>
 - `ALL_IN_ONE = True` -> copiera toutes les polices utlisées dans chacun des ass dans le même dossiers sans distinctions.<br>
-- Vous pouvez aussi mettre le script dans les variables d'environnements pour pouvoir le lancer dans n'importe où.
+- Vous pouvez aussi mettre le script dans les variables d'environnements pour pouvoir le lancer de n'importe où.

@@ -1,7 +1,8 @@
 from ass_tag_parser import parse_ass
 from ass_tag_parser.ass_struct import AssTagFontName, AssTagBold, AssTagItalic, AssTagListOpening, AssTagListEnding
 import ass, os, re, shutil
-from time import perf_counter, sleep
+from sys import exit
+from time import perf_counter
 from matplotlib import font_manager
 from contextlib import redirect_stderr
 from fontTools import ttLib
@@ -11,9 +12,9 @@ WARNING = True #True if you want the warning message
 ALL_IN_ONE = False #True if you want all the fonts in one directory
 
 #Some gobal variables don't touch that
-version = "1.1.0"
+version = "1.1.1"
 d = dict()
-trash, NOPE, dict_per_ass = list(), list(), list()
+NOPE, dict_per_ass = list(), list()
 init(convert=True)
 
 def fall_back(style : str, line: int, assoc: dict) -> str:
@@ -37,6 +38,11 @@ def fall_back(style : str, line: int, assoc: dict) -> str:
     return style
 
 def write_log(lines: list, ass_file: str) -> None:
+    """
+    lines : list of line witch contained \fn tag but couldn't be parsed
+    ass_file : name of the ass file
+    Write things to the log file
+    """
     with open("font_collector.log", 'a', encoding = "utf-8") as log:
         log.write(f"[{ass_file}]\n")
         log.write("Font(s) has been found in the following lines, but there's garbage in it and the parser cound'nt find them.\n")
@@ -44,13 +50,13 @@ def write_log(lines: list, ass_file: str) -> None:
         [log.write(i + '\n') for i in lines]
         log.write("\n")
 
-def ass_parser(assInput: str) -> dict:
+def ass_parser(ass_input: str) -> dict:
     """
-    assInput : path to the .ass file
+    ass_input : path to the .ass file
     Return a dict {Fontname : {"Bold" : Bool, "Italic" : Bool}, ...}
     Could definitly create an object.
     """
-    with open(assInput, encoding="utf_8_sig") as f:
+    with open(ass_input, encoding="utf_8_sig") as f:
         sub = ass.parse(f)
 
     assoc, fonts_assoc = dict(), dict()
@@ -90,7 +96,7 @@ def ass_parser(assInput: str) -> dict:
         except:
             """
             If the line cound'nt be parsed by ass_tag_parser (certainly due to garbage in the tags),
-            will trough an error an write a log file with the problematic(s) line(s).
+            will trow an error an write a log file with the problematic(s) line(s).
             """
             if "\\fn" in i.text:
                 big_problem.append(f"Line {c + 1} : {i.text}")
@@ -121,14 +127,14 @@ def ass_parser(assInput: str) -> dict:
                     fonts_assoc.update({fontname : {"Bold" : bold_insert, "Italic" : italic_insert}})
 
     if big_problem and WARNING:
-        write_log(big_problem, assInput)
+        write_log(big_problem, ass_input)
         if os.path.isfile(os.getcwd() + '\\' + "font_collector.log"):
-            print(Fore.RED + f"[{assInput}]\nAdded to log file" + Style.RESET_ALL)
+            print(Fore.RED + f"[{ass_input}]\nAdded to log file" + Style.RESET_ALL)
         else:
-            print(Fore.RED + f"[{assInput}]\nA log file as been created. RTFL, might be important" + Style.RESET_ALL)
+            print(Fore.RED + f"[{ass_input}]\nA log file as been created. RTFL, might be important" + Style.RESET_ALL)
 
     if garbage and WARNING:
-        print(Fore.LIGHTMAGENTA_EX + f"[{assInput}]\nGarbage found in line : ", end = '')
+        print(Fore.LIGHTMAGENTA_EX + f"[{ass_input}]\nGarbage found in line : ", end = '')
         [print(f"{i} ", end = '') for i in garbage]
         print(Style.RESET_ALL)
 
@@ -149,6 +155,7 @@ def get_ass(path: str) -> list:
 def create_folder(ass_list: list, path: str) -> list:
     """
     Create folder for each .ass without the extension
+    Return list of name of ass file without the extension
     """
     sub_folders = list()
     for i in ass_list:
@@ -161,12 +168,16 @@ def create_folder(ass_list: list, path: str) -> list:
     return sub_folders
 
 def ass_buffer(ass_list: list) -> list:
+    """
+    ass_list : list of ass file (paths)
+    Return list of dict returned by ass_parser function
+    """
     ass_dict_list = list()
     for ass in ass_list:
         add : list = ass_parser(ass)
         dict_per_ass.append(list(add))
         ass_dict_list.append(add)
-    print(Fore.GREEN + "Parsing done for all .ass file." + Style.RESET_ALL)
+    print(Fore.GREEN + "Parsing done for all ASS file." + Style.RESET_ALL)
     return ass_dict_list
 
 def font_name(font_path: str,n: int):
@@ -222,6 +233,15 @@ def font_name(font_path: str,n: int):
         return
 
 def process(start: int, end: int, fonts: list) -> None:
+    """
+    start : int referencing of the starting index of the list fonts
+    end : int referencing of the ending index of the list fonts
+    Start and End where here for the multiprocessing part of launch fonction
+    fonts : list of path to installed fonts
+
+    The function is mainly here to call font_name function and print progress status
+    """
+    mod = int(round((end + 1) / 100, 0))
     for index in range(start, end):
         if fonts[index].lower().endswith(".ttc"):
             n = 1
@@ -230,11 +250,19 @@ def process(start: int, end: int, fonts: list) -> None:
                 font_name(fonts[index], 0 + n)
                 n += 1
         font_name(fonts[index], 0)
-        trash.append(" ")
-        if (len(trash) % int(round((len(fonts) - 1) / 10, 0) + 1)) == 0 and len(trash) != 0:
-            print('\r', f"{len(trash)}/{len(fonts)} fonts checked.", end = '')
+        # if (len(trash) % int(round((len(fonts) - 1) / 10, 0) + 1)) == 0 and len(trash) != 0:
+            # print('\r', f"{len(trash)}/{len(fonts)} fonts checked.", end = '')
+        if (index + 1) % mod == 0:
+            nb = int(round(((index / end) * 100), 0))
+            print('\r', f"[{('█' * int(nb / 5)) + ' ' * (20 - int(nb / 5))}] {nb}% | {index} / {end + 1} fonts checked", end='')
 
-def launch(ass_list: list) -> tuple:
+def launch(ass_list: list) -> list:
+    """
+    ass_list : list of ass file (paths)
+    Return the return of ass_buffer fonction
+    Launch the process function to parse all installed fonts
+    All commented lines where the multiprocessing part witch is basically shit
+    """
     fonts: list = font_manager.findSystemFonts() #fontpaths="{path}"
     # thread_counts: int = cpu_count()
     # threads: list = list()
@@ -242,10 +270,10 @@ def launch(ass_list: list) -> tuple:
     # start: int = 0
     ass_fonts = ass_buffer(ass_list)
     start_time: float = perf_counter()
-    # for i in range(0, thread_counts):
+    # for _ in range(0, thread_counts):
     #     if start + delta > len(fonts) - 1:
     #         start = len(fonts) - 1 - delta
-    #     thread = threading.Thread(target = process, args = (i, start, start + delta, fonts))
+    #     thread = threading.Thread(target = process, args = (start, start + delta, fonts))
     #     start += delta
     #     thread.start()
     #     threads.append(thread)
@@ -259,13 +287,14 @@ def launch(ass_list: list) -> tuple:
         nope = list(set(NOPE))
         [print(i) for i in nope]
 
-    print('\r' + Fore.GREEN + f"{len(fonts)}/{len(fonts)} fonts checked in {round(perf_counter() - start_time, 2)}s.\n" + Style.RESET_ALL)
+    print('\r' + Fore.GREEN + f"[{'█' * 20}] 100% | {len(fonts)} / {len(fonts)} fonts checked in {round(perf_counter() - start_time, 2)}s.\n" + Style.RESET_ALL)
 
     return ass_fonts
 
 def is_eng(string: str) -> bool:
     """
     Check if the font name is writen with ascii characters.
+    Return True if the name is in the ascii characters table, False if not.
     """
     try:
         string.encode(encoding = "utf-8").decode("ascii")
@@ -274,6 +303,11 @@ def is_eng(string: str) -> bool:
     return True
 
 def problem(font: str, ass_file: list) -> None:
+    """
+    font : name of the font:
+    ass_file : list of ass file (paths)
+    Print warning message for all the ass file containing the font
+    """
     print(Fore.CYAN + f"{font} found in ", end = '')
     for c, ass_dict in enumerate(dict_per_ass):
         if font in ass_dict:
@@ -286,6 +320,11 @@ def problem(font: str, ass_file: list) -> None:
     print(Style.RESET_ALL)
 
 def copy(str_from: str, str_to: str) -> None:
+    """
+    str_from : path of the installed font
+    str_to : new path of the font
+    Try in case the font have already been copied.
+    """
     try:
         if ALL_IN_ONE:
             shutil.copy(str_from, os.getcwd())
@@ -298,6 +337,7 @@ def main(mode: str) -> None:
     ass_file = get_ass(os.getcwd())
     if not ass_file:
         print(Fore.RED + "No .ass file found. Closing the script." + Style.RESET_ALL)
+        exit()
     ass_fonts = launch(ass_file)
 
     if mode == "check" and ass_file:
@@ -363,6 +403,7 @@ def main(mode: str) -> None:
                                         print(f"{i} => {d[used_font][i]} to {sub_folders[number]}")
                                 except:
                                     pass
+    print(Fore.GREEN + "###   Done   ###" + Style.RESET_ALL)
 
 if __name__ == "__main__":
     print(f"Font collector v{version}. Just write what's inside the brackets.")

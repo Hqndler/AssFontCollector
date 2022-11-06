@@ -16,10 +16,9 @@ Lancer le script dans le terminal et se laisser guider, tout est expliquer.<br>
 Fini !
 
 # Choses à savoir
-
-### Les lignes 10 et 11 peuvent être modifiée.
-- Ligne 10 : `WARNING = True` -> affichera des avertissements à chaque problème rencontré. `False` pour les désactiver.
-- Ligne 11 : `ALL_IN_ONE = False` -> copiera toutes les polices utilisée dans chacun des ASS, dans des dossiers avec le même nom que le fichier ASS (sans l'extension).<br>
+- Par défault, le script copiera toutes les polices utilisée dans chacun des ASS, dans des dossiers avec le même nom que le fichier ASS (sans l'extension).<br>
 ![Une image vaut plus que mille mots](https://github.com/Hqndler/AssFontCollector/blob/main/Output%20proof%20for%20ALL_IN_ONE%20False.png)<br>
-- `ALL_IN_ONE = True` -> copiera toutes les polices utlisées dans chacun des ASS dans le même dossiers sans distinctions.<br>
+- Vous pouvez lancer le script avec des arguments (ne pas en mettre ne changera pas le comportement) :
+- `-warn` pour désactiver l'affichage des avertissements. Ils s'afficheront par défault.
+- `-aio` copiera toutes les polices utlisées dans chacun des ASS dans le même dossiers sans distinctions.<br>
 - Vous pouvez aussi mettre le script dans les variables d'environnements pour pouvoir le lancer de n'importe où.

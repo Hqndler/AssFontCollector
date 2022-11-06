@@ -3,16 +3,14 @@ from ass_tag_parser.ass_struct import AssTagFontName, AssTagBold, AssTagItalic, 
 import ass, os, re, shutil
 from sys import exit
 from time import perf_counter
+from argparse import ArgumentParser
 from matplotlib import font_manager
 from contextlib import redirect_stderr
 from fontTools import ttLib
 from colorama import init, Fore, Style
 
-WARNING = True #True if you want the warning message
-ALL_IN_ONE = False #True if you want all the fonts in one directory
-
 #Some gobal variables don't touch that
-version = "1.1.1"
+version = "1.1.2"
 d = dict()
 NOPE, dict_per_ass = list(), list()
 init(convert=True)
@@ -159,11 +157,12 @@ def create_folder(ass_list: list, path: str) -> list:
     """
     sub_folders = list()
     for i in ass_list:
-        try:
-            os.mkdir(i.replace(path + '\\', '')[:-4]) 
-            #remove the path and the .ass for better folder name
-        except:
-            pass
+        if not ALL_IN_ONE:
+            try:
+                os.mkdir(i.replace(path + '\\', '')[:-4]) 
+                #remove the path and the .ass for better folder name
+            except:
+                pass
         sub_folders.append(i[:-4])
     return sub_folders
 
@@ -334,6 +333,15 @@ def copy(str_from: str, str_to: str) -> None:
         pass
 
 def main(mode: str) -> None:
+    argv = ArgumentParser(description="Ass Font Collector for ASS files.")
+    argv.add_argument("-aio", default=False, action="store_true", help="If specified, will copy all the fonts in one folder without sorting them out for each ASS")
+    argv.add_argument("-warn", default=True, action="store_false", help="If specified, will not print warnings message.")
+    args = argv.parse_args()
+    global WARNING
+    WARNING = args.warn
+    global ALL_IN_ONE
+    ALL_IN_ONE = args.aio
+    
     ass_file = get_ass(os.getcwd())
     if not ass_file:
         print(Fore.RED + "No .ass file found. Closing the script." + Style.RESET_ALL)
@@ -407,23 +415,21 @@ def main(mode: str) -> None:
 
 if __name__ == "__main__":
     print(f"Font collector v{version}. Just write what's inside the brackets.")
-    check = True
-    while check:
-        rep = int(input("[1] Check - [2] Copy : "))
-        if rep in [1,2]:
-            check = False
+    while True:
+        rep = input("[1] Check - [2] Copy : ")
+        if rep in ['1','2']:
+            break
         else:
             print("Wrong input. Re-try please.")
-    if rep == 1:
+    if rep == '1':
         main("check")
-    if rep == 2:
+    if rep == '2':
         print(f"""This will copy all the fonts in this folder : "{os.getcwd()}".""")
         print("Are you sure ? [Press Enter to continue]")
-        check = True
-        while check:
+        while True:
             r = input()
             if r == "":
-                check = False
                 main("copy")
+                break
             else:
                 print("Only the Enter key will be recognized. Re-try please.")

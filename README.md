@@ -18,12 +18,12 @@ Launch the script in the terminal and follow the steps. Everything is explained.
 Done !
 
 ## Things to know
-
-### You can edit the line 10 and 11.<br>
-- Line 10 : `WARNING = True` -> will print warnings everytime there's a problem, `False` to deseable the warnings.<br>
-- Line 11 : `ALL_IN_ONE = False` -> will copy all the fonts used in each of the ass files, in folders with the same name as the files (without the extension).<br>
+- The script will by default, copy all the fonts used in each of the ass files, in folders with the same name as the files (without the extension).<br>
 ![Proof](https://github.com/Hqndler/AssFontCollector/blob/main/Output%20proof%20for%20ALL_IN_ONE%20False.png)<br>
-- `ALL_IN_ONE = True` -> will copy all the fonts used in each of the ass files within the same folder.<br>
+- You can launch the script with differents arguments if you want :
+- `-warn` to deseable warning, else will print warning message everytime there's a problem<br>
+- `-aio` will copy all the fonts used in each of the ass files within the same folder.<br>
+- Not giving argument will not change the behevior of the script.
 - You can also put the script in the path of you're computer to use it anywhere !
 
 <!-- ### Recommended -->

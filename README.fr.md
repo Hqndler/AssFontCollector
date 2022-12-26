@@ -21,4 +21,7 @@ Fini !
 - Vous pouvez lancer le script avec des arguments (ne pas en mettre ne changera pas le comportement) :
 - `-warn` pour désactiver l'affichage des avertissements. Ils s'afficheront par défault.
 - `-aio` copiera toutes les polices utlisées dans chacun des ASS dans le même dossiers sans distinctions.<br>
+- `-fontpath "<path>"` permet d'ajouter un dossier contenant des polices sans pour autant qu'elles soient installées.
 - Vous pouvez aussi mettre le script dans les variables d'environnements pour pouvoir le lancer de n'importe où.
+
+Exemple : `python ass_font_collector.py -aio -warn -fontpath "chemin/vers/le/dossier"`

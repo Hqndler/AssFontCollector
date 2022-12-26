@@ -23,8 +23,11 @@ Done !
 - You can launch the script with differents arguments if you want :
 - `-warn` to deseable warning, else will print warning message everytime there's a problem<br>
 - `-aio` will copy all the fonts used in each of the ass files within the same folder.<br>
+- `-fontpath "<path>"` to add a folder with fonts that aren't installed.<br>
 - Not giving argument will not change the behevior of the script.
 - You can also put the script in the path of you're computer to use it anywhere !
+
+Example : `python ass_font_collector.py -aio -warn -fontpath "path/to/folder"`
 
 <!-- ### Recommended -->
 <!-- Put the script in the path to use it anywhere -->

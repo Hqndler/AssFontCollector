@@ -202,6 +202,10 @@ def font_name(font_path: str,n: int):
     Adds details[1], details[2] and font_path, the name and style of the font to a global variable\n
     {Name : Style} -> {"Arial" : {"Bold" : arialb.ttf}}
     """
+    
+    if n > 0:
+        font_name(font_path, n - 1)
+    
     details = dict()
     try:
         font = ttLib.TTFont(font_path, fontNumber = n, ignoreDecompileErrors = True)
@@ -259,14 +263,9 @@ def process(start: int, end: int, fonts: list) -> None:
     mod = int(round((end + 1) / 100, 0))
     for index in range(start, end):
         if fonts[index].lower().endswith(".ttc"):
-            n = 1
-            max = len(ttLib.TTCollection(fonts[index]).fonts)
-            while n < max:
-                font_name(fonts[index], 0 + n)
-                n += 1
+            font_name(fonts[index], len(ttLib.TTCollection(fonts[index]).fonts) - 1)
         font_name(fonts[index], 0)
-        # if (len(trash) % int(round((len(fonts) - 1) / 10, 0) + 1)) == 0 and len(trash) != 0:
-            # print('\r', f"{len(trash)}/{len(fonts)} fonts checked.", end = '')
+
         if (index + 1) % mod == 0:
             nb = int(round(((index / end) * 100), 0))
             print('\r', f"[{('█' * int(nb / 5)) + ' ' * (20 - int(nb / 5))}] {nb}% | {index} / {end + 1} fonts checked", end='')
@@ -285,7 +284,7 @@ def launch(ass_list: list, fontpath: str = None) -> list:
     ass_fonts = ass_buffer(ass_list)
     start_time: float = perf_counter()
 
-    process(0,len(fonts) - 1, fonts) #for singlethreaded load
+    process(0,len(fonts), fonts) #for singlethreaded load
 
     if NOPE:
         nope = list(set(NOPE))

@@ -1,6 +1,7 @@
 from ass_tag_parser import parse_ass
 from ass_tag_parser.ass_struct import AssTagFontName, AssTagBold, AssTagItalic, AssTagListOpening, AssTagListEnding
 import ass, os, re, shutil
+from multiprocessing import Pool
 from sys import exit
 from time import perf_counter
 from argparse import ArgumentParser
@@ -9,13 +10,16 @@ from contextlib import redirect_stderr
 from fontTools import ttLib
 from colorama import init, Fore, Style, Back
 
-#Some gobal variables don't touch that
+# Some gobal variables don't touch that
 version = "1.1.3"
-d = dict()
-NOPE, dict_per_ass = list(), list()
+d, NOPE = dict(), list()
+
+# Regex compile
 re_clip = re.compile("clip\(.*?\)")
 re_fs = re.compile("fs\d*\.\d")
 re_neg = re.compile("-\d+")
+
+# Colors
 init(convert=True)
 
 def fall_back(style : str, line: int, assoc: dict) -> str:
@@ -71,7 +75,8 @@ def ass_parser(ass_input: str) -> dict:
         assoc.update({i.name : {fontname : {"Bold" : i.bold, "Italic" : i.italic}}})
 
     for c,events in enumerate(sub.events):
-        # print(f"{type(events)} -> {events}")
+        if c % 100 == 0:
+            print('\r',f"{events.text[:50]}", end="")
         if isinstance(events, ass.line.Comment):
             #Skip the line if not Dialogue type
             continue
@@ -119,27 +124,11 @@ def ass_parser(ass_input: str) -> dict:
                     italic_insert = italic if fonts_assoc[fontname]["Italic"] == False else True
                 #the bool is updated only if the previous state was False, if not False -> True, will overwrite with True
                 except:
-                    pass
+                    continue
                 if bold_insert or italic_insert:
                     fonts_assoc.update({fontname : {"Bold" : bold_insert, "Italic" : italic_insert}})
 
-    if big_problem and WARNING:
-        write_log(big_problem, ass_input)
-        if os.path.isfile(os.getcwd() + '\\' + "font_collector.log"):
-            print(Fore.RED + f"[{ass_input}]\nAdded to log file" + Style.RESET_ALL)
-        else:
-            print(Fore.RED + f"[{ass_input}]\nA log file as been created. RTFL, might be important" + Style.RESET_ALL)
-
-    if garbage and WARNING:
-        print(Fore.LIGHTMAGENTA_EX + f"[{ass_input}]\nGarbage found in line : ", end = '')
-        if len(garbage) > 50:
-            for i in range(0,30):
-                print(f"{garbage[i]} ", end='')
-            print(f"and {len(garbage) - 30} more")
-        else:
-            [print(f"{i} ", end = '') for i in garbage]
-        print(Style.RESET_ALL)
-    return fonts_assoc
+    return fonts_assoc, big_problem, garbage
 
 def get_ass(path: str) -> list:
     """
@@ -175,12 +164,34 @@ def ass_buffer(ass_list: list) -> list:
     
     Return list of dict returned by ass_parser function
     """
+    a_start = perf_counter()
     ass_dict_list = list()
-    for ass in ass_list:
-        add : list = ass_parser(ass)
-        dict_per_ass.append(list(add))
-        ass_dict_list.append(add)
-    print(Fore.GREEN + "Parsing done for all ASS file." + Style.RESET_ALL)
+    with Pool() as pool:
+        result = pool.map(ass_parser, ass_list)
+        
+        c = 0
+        print('\r',f"{' '*300}")
+        for assoc, problem, garbage in result:
+            if problem and WARNING:
+                write_log(problem, ass_list[c])
+                if os.path.isfile(os.getcwd() + '\\' + "font_collector.log"):
+                    print(Fore.RED + f"[{ass_list[c]}]\nAdded to log file" + Style.RESET_ALL)
+                else:
+                    print(Fore.RED + f"[{ass_list[c]}]\nA log file as been created. RTFL, might be important" + Style.RESET_ALL)
+
+            if garbage and WARNING:
+                print(Fore.LIGHTMAGENTA_EX + f"[{ass_list[c]}]\nGarbage found in line : ", end = '')
+                if len(garbage) > 50:
+                    for i in range(0,30):
+                        print(f"{garbage[i]} ", end='')
+                    print(f"and {len(garbage) - 30} more")
+                else:
+                    [print(f"{i} ", end = '') for i in garbage]
+                print(Style.RESET_ALL)
+            c += 1    
+            ass_dict_list.append(assoc)
+
+    print(Fore.GREEN + f"Parsing done for all ASS file in {round(perf_counter() - a_start, 2)}s." + Style.RESET_ALL)
     return ass_dict_list
 
 def font_name(font_path: str,n: int):
@@ -254,6 +265,8 @@ def process(start: int, end: int, fonts: list) -> None:
                 font_name(fonts[index], 0 + n)
                 n += 1
         font_name(fonts[index], 0)
+        # if (len(trash) % int(round((len(fonts) - 1) / 10, 0) + 1)) == 0 and len(trash) != 0:
+            # print('\r', f"{len(trash)}/{len(fonts)} fonts checked.", end = '')
         if (index + 1) % mod == 0:
             nb = int(round(((index / end) * 100), 0))
             print('\r', f"[{('█' * int(nb / 5)) + ' ' * (20 - int(nb / 5))}] {nb}% | {index} / {end + 1} fonts checked", end='')
@@ -265,27 +278,12 @@ def launch(ass_list: list, fontpath: str = None) -> list:
     
     Return the return of ass_buffer fonction\n
     Launch the process function to parse all installed fonts
-    All commented lines where the multiprocessing part witch is basically shit
     """
-    fonts: list = font_manager.findSystemFonts() #fontpaths="{path}"
+    fonts: list = font_manager.findSystemFonts()
     if fontpath:
         fonts += font_manager.findSystemFonts(fontpaths=fontpath)
-    # thread_counts: int = cpu_count()
-    # threads: list = list()
-    # delta = int(round(len(fonts) / thread_counts, 0))
-    # start: int = 0
     ass_fonts = ass_buffer(ass_list)
     start_time: float = perf_counter()
-    # for _ in range(0, thread_counts):
-    #     if start + delta > len(fonts) - 1:
-    #         start = len(fonts) - 1 - delta
-    #     thread = threading.Thread(target = process, args = (start, start + delta, fonts))
-    #     start += delta
-    #     thread.start()
-    #     threads.append(thread)
-    
-    # for thread in threads:
-    #     thread.join()
 
     process(0,len(fonts) - 1, fonts) #for singlethreaded load
 
@@ -308,7 +306,7 @@ def is_eng(string: str) -> bool:
         return False
     return True
 
-def problem(font: str, ass_file: list) -> None:
+def problem(font: str, ass_file: list, dict_per_ass: list) -> None:
     """
     font : name of the font
     ass_file : list of ass file (paths)
@@ -323,7 +321,7 @@ def problem(font: str, ass_file: list) -> None:
     if is_eng(font):
         print(" but no corresponding font installed", end = '')
     if not is_eng(font):
-        print(" and the font name can't be used by script.", end = '')
+        print(" and the font name can't be used by the script.", end = '')
     print(Style.RESET_ALL)
 
 def copy(str_from: str, str_to: str) -> None:
@@ -367,6 +365,7 @@ def main(mode: str) -> None:
         print(Fore.RED + "No .ass file found. Closing the script." + Style.RESET_ALL)
         exit()
     ass_fonts = launch(ass_file, args.fontpath)
+    dpa = list(map(list, ass_fonts))
     not_installed = list()
 
     if mode == "check" and ass_file:
@@ -381,7 +380,7 @@ def main(mode: str) -> None:
                         continue
                 else:
                     if used_font not in not_installed:
-                        problem(used_font, ass_file)
+                        problem(used_font, ass_file, dpa)
                         not_installed.append(used_font)
                     else:
                         continue
@@ -392,7 +391,7 @@ def main(mode: str) -> None:
             for used_font in assoc:
             # If the font isn't installed
                 if used_font not in d and not used_font in not_installed:
-                    problem(used_font, ass_file)
+                    problem(used_font, ass_file, dpa)
                     not_installed.append(used_font)
                 if used_font in d:
 

@@ -15,7 +15,7 @@ pip install fontTools tox colorama ass ass_tag_parser
 Put the script inside the folder where the ass files are.<br>
 Make sure there's only the ass files you want to extract the fonts.<br>
 Launch the script in the terminal and follow the steps. Everything is explained.<br>
-The script might not catch all the font used, read what's in the terminal.
+The script might not catch all the font used, read what's in the terminal.<br>
 Done !
 
 ## Things to know

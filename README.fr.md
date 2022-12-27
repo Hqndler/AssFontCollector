@@ -13,6 +13,7 @@ pip install fontTools tox colorama ass ass_tag_parser
 Mettre le script dans le dossier avec tout les ASS.<br>
 Faites en sortes qu'il n'y ai que les ASS dont vous voulez extraire les polices dans le dossier.<br>
 Lancer le script dans le terminal et se laisser guider, tout est expliquer.<br>
+#### Le script n'est pas parfait, il se peut qu'il ne trouve pas toute les polices, lire le terminal et le log peut aider.<br>
 Fini !
 
 # Choses à savoir

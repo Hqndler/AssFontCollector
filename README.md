@@ -7,7 +7,7 @@ Personal python solution to extract used font in one or more ass file.
 
 Python 3.6+ 
 ```
-pip install fontTools tox colorama ass ass_tag_parser
+pip install fontTools tox colorama ass ass_tag_parser tqdm
 ```
 
 ## Usage

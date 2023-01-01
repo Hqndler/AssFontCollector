@@ -30,6 +30,11 @@ Done !
 
 Example : `python ass_font_collector.py -aio -warn -fontpath "path/to/folder"`
 
+## Disclaimer for aegisub nerd
+
+- \r tag is not supported, please use real tag that are useful.
+- If you use some kind of modded version of aegisub which handles \b100-\b900 and any fancy stuff like this, the script might not recognize the font.
+
 <!-- ### Recommended -->
 <!-- Put the script in the path to use it anywhere -->
 

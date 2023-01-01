@@ -26,3 +26,8 @@ Fini !
 - Vous pouvez aussi mettre le script dans les variables d'environnements pour pouvoir le lancer de n'importe où.
 
 Exemple : `python ass_font_collector.py -aio -warn -fontpath "chemin/vers/le/dossier"`
+
+## Disclaimer
+
+- \r n'est pas supporté, merci de ne pas l'utiliser.
+- Si vous utilisez une version moddé d'aegisub prenant en charge les \b100->\b900, la police utilisée risque de ne pas être reconnue.

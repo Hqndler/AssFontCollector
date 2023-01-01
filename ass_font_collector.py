@@ -2,6 +2,7 @@ from ass_tag_parser import parse_ass
 from ass_tag_parser.ass_struct import AssTagFontName, AssTagBold, AssTagItalic, AssTagListOpening, AssTagListEnding
 import ass, os, re, shutil
 from multiprocessing import Pool
+from tqdm import tqdm
 from sys import exit
 from time import perf_counter
 from argparse import ArgumentParser
@@ -11,7 +12,7 @@ from fontTools import ttLib
 from colorama import init, Fore, Style, Back
 
 # Some gobal variables don't touch that
-version = "1.1.3"
+version = "1.1.4"
 d, NOPE = dict(), list()
 
 # Regex compile
@@ -57,7 +58,7 @@ def write_log(lines: list, ass_file: str) -> None:
         [log.write(i + '\n') for i in lines]
         log.write("\n")
 
-def ass_parser(ass_input: str) -> dict:
+def ass_parser(position: int, ass_input: str) -> dict:
     """
     ass_input : path to the .ass file
     
@@ -74,9 +75,7 @@ def ass_parser(ass_input: str) -> dict:
         #Remove the unwanted "@" in the beginning of the fontname
         assoc.update({i.name : {fontname : {"Bold" : i.bold, "Italic" : i.italic}}})
 
-    for c,events in enumerate(sub.events):
-        if c % 100 == 0:
-            print('\r',f"{events.text[:50]}", end="")
+    for c,events in tqdm(enumerate(sub.events), total=len(sub.events), desc = os.path.basename(ass_input), unit=" lines", bar_format="{l_bar}{bar:50}{r_bar}{bar:-10b}", leave=False):
         if isinstance(events, ass.line.Comment):
             #Skip the line if not Dialogue type
             continue
@@ -84,7 +83,7 @@ def ass_parser(ass_input: str) -> dict:
         line_style : str = fall_back(events.style, c + 1, assoc)
         fontname = list(assoc[line_style])[0]
         bold, italic = assoc[line_style][fontname]["Bold"], assoc[line_style][fontname]["Italic"]
-        if fontname not in fonts_assoc and not "\\fn" in events.text and not re.search("p[0-9]", events.text):
+        if fontname not in fonts_assoc and not re.search("p[0-9]", events.text) and (len(re.findall(r"\\fn", str(events.text))) == 0 or len(re.findall(r"\\fn\w+", events.text)) != len(re.findall(r"\\fn", events.text))): #yes this line is comically long
             fonts_assoc.update({fontname : {"Bold" : bold, "Italic" : italic}})
         #Put the font used in that style in fonts_assoc because we know for sure it will be used
 
@@ -100,18 +99,19 @@ def ass_parser(ass_input: str) -> dict:
             If the line cound'nt be parsed by ass_tag_parser (certainly due to garbage in the tags),
             will trow an error an write a log file with the problematic(s) line(s).
             """
-            if "\\fn" in events.text:
-                big_problem.append(f"Line {c + 1} : {events.text}")
             if re.search("p[0-9]", events.text):
                 continue
+            if "\\fn" in events.text:
+                big_problem.append(f"Line {c + 1} : {events.text}")
             else:
                 garbage.append(c+1)
             continue
 
         for i in parse_arg:
             if isinstance(i, AssTagFontName):
-                fontname = i.name[1:].strip() if i.name.startswith('@') else i.name.strip()
-                fonts_assoc.update({fontname : {"Bold" : False, "Italic" : False}})
+                if i.name is not None:
+                    fontname = i.name[1:].strip() if i.name.startswith('@') else i.name.strip()
+                    fonts_assoc.update({fontname : {"Bold" : False, "Italic" : False}})
             if isinstance(i, AssTagBold):
                 bold = i.enabled
             if isinstance(i, AssTagItalic):
@@ -167,10 +167,8 @@ def ass_buffer(ass_list: list) -> list:
     a_start = perf_counter()
     ass_dict_list = list()
     with Pool() as pool:
-        result = pool.map(ass_parser, ass_list)
-        
+        result = pool.starmap(ass_parser, enumerate(ass_list))
         c = 0
-        print('\r',f"{' '*300}")
         for assoc, problem, garbage in result:
             if problem and WARNING:
                 write_log(problem, ass_list[c])
@@ -270,6 +268,11 @@ def process(start: int, end: int, fonts: list) -> None:
             nb = int(round(((index / end) * 100), 0))
             print('\r', f"[{('█' * int(nb / 5)) + ' ' * (20 - int(nb / 5))}] {nb}% | {index} / {end + 1} fonts checked", end='')
 
+def write_dict(d: dict):
+    with open("index.txt", "a", encoding="utf-8") as f:
+        for i in d:
+            f.write(f"{i} : {d[i]}\n")
+
 def launch(ass_list: list, fontpath: str = None) -> list:
     """
     ass_list : list of ass file (paths)
@@ -291,8 +294,14 @@ def launch(ass_list: list, fontpath: str = None) -> list:
         [print(i) for i in nope]
 
     print('\r' + Fore.GREEN + f"[{'█' * 20}] 100% | {len(fonts)} / {len(fonts)} fonts checked in {round(perf_counter() - start_time, 2)}s.\n" + Style.RESET_ALL)
-
+    # write_dict(d)
     return ass_fonts
+
+def dict_lower(d: dict) -> dict:
+    d_assoc = dict()
+    for i in d:
+        d_assoc.update({i.lower() : i})
+    return d_assoc
 
 def is_eng(string: str) -> bool:
     """
@@ -365,13 +374,15 @@ def main(mode: str) -> None:
         exit()
     ass_fonts = launch(ass_file, args.fontpath)
     dpa = list(map(list, ass_fonts))
+    d_assoc = dict_lower(d)
     not_installed = list()
 
     if mode == "check" and ass_file:
         installed = list()
         for assoc in ass_fonts:
             for used_font in assoc:
-                if used_font in d:
+                if used_font.lower() in d_assoc:
+                    used_font = d_assoc[used_font.lower()]
                     if used_font not in installed:
                         print(Fore.GREEN + f"{used_font} installed." + Style.RESET_ALL)
                         installed.append(used_font)
@@ -389,44 +400,45 @@ def main(mode: str) -> None:
         for number, assoc in enumerate(ass_fonts):
             for used_font in assoc:
             # If the font isn't installed
-                if used_font not in d and not used_font in not_installed:
+                if used_font.lower() not in d_assoc and not used_font in not_installed:
                     problem(used_font, ass_file, dpa)
                     not_installed.append(used_font)
-                if used_font in d:
+                if used_font.lower() in d_assoc:
+                    used_font_d = d_assoc[used_font.lower()]
 
                     # If there's only one style for the font
-                    if len(d[used_font]) == 1:
-                        copy(d[used_font][list(d[used_font])[0]], sub_folders[number])
+                    if len(d[used_font_d]) == 1:
+                        copy(d[used_font_d][list(d[used_font_d])[0]], sub_folders[number])
 
                     # Check for bold and italic variantes of the font
                     if assoc[used_font]["Bold"] == True or assoc[used_font]["Italic"] == True:
                         check = 0
-                        if "Bold" in d[used_font] and assoc[used_font]["Bold"] == True:
+                        if "Bold" in d[used_font_d] and assoc[used_font]["Bold"] == True:
                             check += 1
-                            copy(d[used_font]["Bold"], sub_folders[number])
+                            copy(d[used_font_d]["Bold"], sub_folders[number])
 
-                        if "Italic" in d[used_font] and assoc[used_font]["Italic"] == True:
+                        if "Italic" in d[used_font_d] and assoc[used_font]["Italic"] == True:
                             check += 1
-                            copy(d[used_font]["Italic"], sub_folders[number])
+                            copy(d[used_font_d]["Italic"], sub_folders[number])
                                 
-                        if check == 2 and "Bold Italic" in d[used_font]:
-                            copy(d[used_font]["Bold Italic"], sub_folders[number])
+                        if check == 2 and "Bold Italic" in d[used_font_d]:
+                            copy(d[used_font_d]["Bold Italic"], sub_folders[number])
                         
                     # Check for regular style font, if not will give all the fonts with same font name, how can you guess that the only style for a specific font is bold for example
-                    if len(d[used_font]) > 1:
-                        if "Regular" in d[used_font]:
-                            copy(d[used_font]["Regular"], sub_folders[number])
+                    if len(d[used_font_d]) > 1:
+                        if "Regular" in d[used_font_d]:
+                            copy(d[used_font_d]["Regular"], sub_folders[number])
 
                         else:
-                            print(f"There's no Regular style in {used_font}, all the font with the same familly name will be copied.")
-                            for i in d[used_font]:
+                            print(f"There's no Regular style in {used_font_d}, all the font with the same familly name will be copied.")
+                            for i in d[used_font_d]:
                                 try:
                                     if ALL_IN_ONE:
-                                        shutil.copy(d[used_font][i], os.getcwd())
-                                        print(f"{i} => {d[used_font][i]} to {os.getcwd()}")
+                                        shutil.copy(d[used_font_d][i], os.getcwd())
+                                        print(f"{i} => {d[used_font_d][i]} to {os.getcwd()}")
                                     else:
-                                        shutil.copy(d[used_font][i], sub_folders[number])
-                                        print(f"{i} => {d[used_font][i]} to {sub_folders[number]}")
+                                        shutil.copy(d[used_font_d][i], sub_folders[number])
+                                        print(f"{i} => {d[used_font_d][i]} to {sub_folders[number]}")
                                 except:
                                     pass
     print(Fore.GREEN + "###   Done   ###" + Style.RESET_ALL)

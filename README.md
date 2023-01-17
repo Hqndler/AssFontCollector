@@ -7,7 +7,7 @@ Personal python solution to extract used font in one or more ass file.
 
 Python 3.6+ 
 ```
-pip install fontTools tox colorama ass ass_tag_parser tqdm
+pip install fontTools tox colorama ass ass_tag_parser tqdm matplotlib
 ```
 
 ## Usage
@@ -15,6 +15,7 @@ pip install fontTools tox colorama ass ass_tag_parser tqdm
 Put the script inside the folder where the ass files are.<br>
 Make sure there's only the ass files you want to extract the fonts.<br>
 Launch the script in the terminal and follow the steps. Everything is explained.<br>
+`python ass_font_collector.py`<br>
 The script might not catch all the font used, read what's in the terminal.<br>
 Done !
 

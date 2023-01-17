@@ -5,7 +5,7 @@ Solution personnelle pour extraire des polices utilisée dans un ou plusieurs fi
 ## Avant toute chose assurez vous de bien tout mettre à jour !
 Python 3.6 ou supérieur
 ```
-pip install fontTools tox colorama ass ass_tag_parser tqdm
+pip install fontTools tox colorama ass ass_tag_parser tqdm matplotlib
 ```
 
 ## Comment l'utiliser
@@ -13,6 +13,7 @@ pip install fontTools tox colorama ass ass_tag_parser tqdm
 Mettre le script dans le dossier avec tout les ASS.<br>
 Faites en sortes qu'il n'y ai que les ASS dont vous voulez extraire les polices dans le dossier.<br>
 Lancer le script dans le terminal et se laisser guider, tout est expliquer.<br>
+`python ass_font_collector.py`<br>
 #### Le script n'est pas parfait, il se peut qu'il ne trouve pas toute les polices, lire le terminal et le log peut aider.<br>
 Fini !
 

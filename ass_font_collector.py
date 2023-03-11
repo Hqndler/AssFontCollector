@@ -12,7 +12,7 @@ from fontTools import ttLib
 from colorama import init, Fore, Style, Back
 
 # Some gobal variables don't touch that
-version = "1.1.4"
+version = "1.2.0"
 d, NOPE = dict(), list()
 
 # Regex compile
@@ -23,7 +23,7 @@ re_neg = re.compile("-\d+")
 # Colors
 init(convert=True)
 
-def fall_back(style : str, line: int, assoc: dict) -> str:
+def fall_back(style : str, line: int, assoc: dict) -> tuple:
     """
     style : the name of the style in the line
     line : the number of the line in the ass
@@ -31,18 +31,19 @@ def fall_back(style : str, line: int, assoc: dict) -> str:
     
     Return style name if in assoc, else return "Default" if Default style in the ass or create a new Default fall back style, with Arial font.
     """
+    s = list()
     if style in assoc:
-        return style
+        return style, s
 
-    print(Fore.CYAN + f"The style {style} does not exist (line {line})" + Style.RESET_ALL)
+    s.append(Fore.CYAN + f"The style \"{style}\" does not exist (line {line})" + Style.RESET_ALL)
     style = "Default"
 
     if style not in assoc:
         assoc.update({"Default_new" : {"Arial" : {"Bold" : False, "Italic" : False}}})
-        print(Fore.RED + f"""No "Default" fall-back style in the ass replaced by Arial""" + Style.RESET_ALL)
+        s.append(Fore.RED + f"""No "Default" fall-back style in the ass replaced by Arial""" + Style.RESET_ALL)
         style = "Default_new"
 
-    return style
+    return style, s
 
 def write_log(lines: list, ass_file: str) -> None:
     """
@@ -58,7 +59,7 @@ def write_log(lines: list, ass_file: str) -> None:
         [log.write(i + '\n') for i in lines]
         log.write("\n")
 
-def ass_parser(position: int, ass_input: str) -> dict:
+def ass_parser(position: int, ass_input: str) -> tuple:
     """
     ass_input : path to the .ass file
     
@@ -69,7 +70,7 @@ def ass_parser(position: int, ass_input: str) -> dict:
         sub = ass.parse(f)
 
     assoc, fonts_assoc = dict(), dict()
-    big_problem, garbage = list(), list()
+    big_problem, garbage, style_problem = list(), list(), list()
     for i in sub.styles:
         fontname : str = i.fontname[1:].strip() if i.fontname.startswith('@') else i.fontname.strip()
         #Remove the unwanted "@" in the beginning of the fontname
@@ -80,7 +81,9 @@ def ass_parser(position: int, ass_input: str) -> dict:
             #Skip the line if not Dialogue type
             continue
 
-        line_style : str = fall_back(events.style, c + 1, assoc)
+        tmp = fall_back(events.style, c + 1, assoc)
+        line_style : str = tmp[0]
+        style_problem += tmp[1]
         fontname = list(assoc[line_style])[0]
         bold, italic = assoc[line_style][fontname]["Bold"], assoc[line_style][fontname]["Italic"]
         if fontname not in fonts_assoc and not re.search("p[0-9]", events.text) and (len(re.findall(r"\\fn", str(events.text))) == 0 or len(re.findall(r"\\fn\w+", events.text)) != len(re.findall(r"\\fn", events.text))): #yes this line is comically long
@@ -128,7 +131,7 @@ def ass_parser(position: int, ass_input: str) -> dict:
                 if bold_insert or italic_insert:
                     fonts_assoc.update({fontname : {"Bold" : bold_insert, "Italic" : italic_insert}})
 
-    return fonts_assoc, big_problem, garbage
+    return fonts_assoc, big_problem, garbage, style_problem
 
 def get_ass(path: str) -> list:
     """
@@ -166,10 +169,16 @@ def ass_buffer(ass_list: list) -> list:
     """
     a_start = perf_counter()
     ass_dict_list = list()
+    # for i in ass_list:
     with Pool() as pool:
         result = pool.starmap(ass_parser, enumerate(ass_list))
+        # assoc, problem, garbage = ass_parser(0, i)
         c = 0
-        for assoc, problem, garbage in result:
+        for assoc, problem, garbage, style in result:
+            if style:
+                print(f"[{ass_list[c]}]")
+                [print(i) for i in style]
+
             if problem and WARNING:
                 write_log(problem, ass_list[c])
                 if os.path.isfile(os.getcwd() + '\\' + "font_collector.log"):
@@ -186,7 +195,7 @@ def ass_buffer(ass_list: list) -> list:
                 else:
                     [print(f"{i} ", end = '') for i in garbage]
                 print(Style.RESET_ALL)
-            c += 1    
+            c += 1
             ass_dict_list.append(assoc)
 
     print(Fore.GREEN + f"Parsing done for all ASS file in {round(perf_counter() - a_start, 2)}s." + Style.RESET_ALL)
@@ -200,7 +209,7 @@ def font_name(font_path: str,n: int):
     Adds details[1], details[2] and font_path, the name and style of the font to a global variable\n
     {Name : Style} -> {"Arial" : {"Bold" : arialb.ttf}}
     """
-    
+
     if n > 0:
         font_name(font_path, n - 1)
     

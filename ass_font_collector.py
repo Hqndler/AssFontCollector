@@ -12,7 +12,7 @@ from fontTools import ttLib
 from colorama import init, Fore, Style, Back
 
 # Some gobal variables don't touch that
-version = "1.2.0"
+version = "1.2.1"
 d, NOPE = dict(), list()
 
 # Regex compile
@@ -36,9 +36,15 @@ def fall_back(style : str, line: int, assoc: dict) -> tuple:
         return style, s
 
     s.append(Fore.CYAN + f"The style \"{style}\" does not exist (line {line})" + Style.RESET_ALL)
-    style = "Default"
+    style = "default"
 
-    if style not in assoc:
+    check : bool = False
+    for i in assoc:
+        if i.lower() == style:
+            check = True
+            break
+
+    if not check:
         assoc.update({"Default_new" : {"Arial" : {"Bold" : False, "Italic" : False}}})
         s.append(Fore.RED + f"""No "Default" fall-back style in the ass replaced by Arial""" + Style.RESET_ALL)
         style = "Default_new"

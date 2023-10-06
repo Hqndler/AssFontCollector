@@ -1,4 +1,4 @@
-# Ass Font Collector
+# Ass Font Collector (Deprecated for now)
 
 [French README](https://github.com/Hqndler/AssFontCollector/blob/main/README.fr.md)<br><br>
 Personal python solution to extract used font in one or more ass file.

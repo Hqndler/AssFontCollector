@@ -1,4 +1,4 @@
-# Ass Font Collector
+# Ass Font Collector (Déconseillé pour l'instant)
 
 Solution personnelle pour extraire des polices utilisée dans un ou plusieurs fichier ASS.
 

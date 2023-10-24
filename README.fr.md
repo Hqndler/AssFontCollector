@@ -1,7 +1,7 @@
 # Ass Font Collector (Déconseillé pour l'instant)
 
 Solution personnelle* pour tester ou copier la disponibilité des polices utilisées dans un ou plusieurs fichier ASS.
-###### cf [Reconnaissance](https://github.com/Hqndler/AssFontCollector/blob/main/README.fr.md#reconnaissance)
+###### cf [Origine du projet](https://github.com/Hqndler/AssFontCollector/blob/main/README.fr.md#origine-du-projet)
 
 ## Avant toute chose assurez vous de bien tout mettre à jour !
 Python 3.6 ou supérieur

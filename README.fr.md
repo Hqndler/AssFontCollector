@@ -16,18 +16,28 @@ Mettre le script dans le dossier avec tout les ASS.<br>
 Fini !
 
 # Choses à savoir
-- Par défault, le script copiera toutes les polices utilisée dans chacun des ASS, dans des dossiers avec le même nom que le fichier ASS (sans l'extension).<br>
+- Par défault, le script copiera toutes les polices utilisée dans chacun des ASS, et créera des dossiers avec le même nom que le fichier ASS (sans l'extension).<br>
 ![image](https://github.com/Hqndler/AssFontCollector/assets/69089935/e220c800-1fa2-44c2-a7a3-5e77ed99f5f1)
 - Vous pouvez lancer le script avec des arguments (ne pas en mettre ne changera pas le comportement) :
 - `--check` lancera directement le script en mode check.
 - `--copy` lancera directement le script en mode copie.
-- `--aio` copiera toutes les polices utlisées dans chacun des ASS dans le même dossiers sans distinctions.<br>
+- `--aio` copiera toutes les polices utlisées dans chacun des ASS dans un seul dossier sans distinctions.
 - `--path "<path>"` permet d'ajouter un dossier contenant des polices sans pour autant qu'elles soient installées.
-- `-i` / `--input` permet d'ajouter autant de fichiers ou de dossiers que vous voulez, seuls ces fichiers (ou fichiers dans les dossiers ajoutés) seront utilisé par la suite.
+- `-i` / `--input` permet d'ajouter autant de fichiers ASS ou de dossiers que vous voulez, seuls ces fichiers (ou fichiers dans les dossiers ajoutés) seront utilisé par la suite.
 - Vous pouvez aussi mettre le script dans les variables d'environnements pour pouvoir le lancer de n'importe où.
 
 Exemple : `python ass_font_collector.py --check --path "chemin/vers/le/dossier" -i fichier.ass ../dossier/autre.ass`
 
-## Reconnaissance
-Depuis la version 2.0.0, le script n'est qu'une réécriture du projet de moi15moi [Fontcollector](https://github.com/moi15moi/FontCollector), pourquoi ne pas le fork alors ? C'est une solution différente de la sienne, il utilise ses propres outils qu'il a codé, j'utilise les miens. Dans ce script je n'utilise aucune des bibliotheque que moi15moi a codé. Mais je reconnais qu'une très grande partie du code vient de lui, toute la partie récupération des noms de police vient presque entièrement de son code. Je ne voulais pas non plus installer son script, je voulais une solution portable en un seul fichier ("mais tu pouvais compiler son projet et c'était réglé" oui mais non). Je voulais aussi d'autre option que je trouve plus importante que de merge des polices dans un ass, une option pour simplement checker et non pas tout le temps copier, avoir un affichage plus clair etc. J'ai fait la partie parsing du texte bien qu'elle soit très grandement inspiré du code de moi15moi.<br>
-Le projet de moi15moi et le miens était différent au début mais on a tout les deux été inspiré mais le seul et unique WheneverDev [fontmerge](https://github.com/WheneverDev/fontmerge)
+## Origine du projet
+
+Depuis la version 2.0.0, le script n'est qu'une réécriture du projet de moi15moi [Fontcollector](https://github.com/moi15moi/FontCollector) (un très bon projet), pourquoi ne pas le fork alors ?<br>
+C'est une solution alternative à la sienne, il utilise ses propres outils qu'il a développé.<br>
+Dans ce script aucune des bibliotheque que moi15moi a développé n'ont été utilisées. Mais je reconnais qu'une très grande partie du code vient de lui, dont notamment la partie concernant la récupération des noms de police.<br>
+
+## Proposition
+
+Ne désirant pas installer son script, j'ai opté pour une solution portable en un seul fichier ("mais tu pouvais compiler son projet et c'était réglé" oui mais non). Cherchant d'autre alternative que de le muxage des polices dans un mkv, j'ai rajouté une option pour tester la disponibilité des polices et non pas une simple copie, amélioré de la lisibilité etc.<br>
+Le script ne devrait jamais crash n'hésitez à ouvrir une issue si crash.
+
+## Remerciement
+Le projet de moi15moi et le mien étaient différent au début mais on a tout les deux été inspiré par le seul et unique WheneverDev [fontmerge](https://github.com/WheneverDev/fontmerge)

@@ -1,4 +1,4 @@
-# Ass Font Collector (Deprecated for now)
+# Ass Font Collector v2
 
 [French README](https://github.com/Hqndler/AssFontCollector/blob/main/README.fr.md)<br><br>
 Personal* python solution to check or copy used font in one or more ass file.

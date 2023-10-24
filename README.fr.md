@@ -30,6 +30,7 @@ Exemple : `python ass_font_collector.py --check --path "chemin/vers/le/dossier" 
 
 ## Origine du projet
 
+N'ayant pas envie de d'ouvrir plein de fichier ASS pour en extraire les polices utilisées, j'ai créer ce script.
 Depuis la version 2.0.0, le script n'est qu'une réécriture du projet de moi15moi [Fontcollector](https://github.com/moi15moi/FontCollector) (un très bon projet), pourquoi ne pas le fork alors ?<br>
 C'est une solution alternative à la sienne, il utilise ses propres outils qu'il a développé.<br>
 Dans ce script aucune des bibliotheque que moi15moi a développé n'ont été utilisées. Mais je reconnais qu'une très grande partie du code vient de lui, dont notamment la partie concernant la récupération des noms de police.<br>
@@ -37,7 +38,12 @@ Dans ce script aucune des bibliotheque que moi15moi a développé n'ont été ut
 ## Proposition
 
 Ne désirant pas installer son script, j'ai opté pour une solution portable en un seul fichier ("mais tu pouvais compiler son projet et c'était réglé" oui mais non). Cherchant d'autre alternative que de le muxage des polices dans un mkv, j'ai rajouté une option pour tester la disponibilité des polices et non pas une simple copie, amélioré de la lisibilité etc.<br>
+La partie vérification des glyphs n'est pas présente ne la trouvant pas utile, ce qui permet d'avoir une meilleur vitesse d'execution.<br>
 Le script ne devrait jamais crash n'hésitez à ouvrir une issue si crash.
+
+## Attention
+
+Ce script ce prétant pas remplacer le collecteur de police d'aegisub et ne fonctionne pas pareil, bien qu'essayant de s'en rapprocher le plus possible.
 
 ## Remerciement
 Le projet de moi15moi et le mien étaient différent au début mais on a tout les deux été inspiré par le seul et unique WheneverDev [fontmerge](https://github.com/WheneverDev/fontmerge)

@@ -2,7 +2,7 @@
 
 [French README](https://github.com/Hqndler/AssFontCollector/blob/main/README.fr.md)<br><br>
 Personal* python solution to check or copy used font in one or more ass file.
-###### *see [Acknowledgement](https://github.com/Hqndler/AssFontCollector#acknowledgement)
+###### *see [below](https://github.com/Hqndler/AssFontCollector#origin-of-the-project)
 
 ## Requirement 
 

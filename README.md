@@ -1,46 +1,36 @@
 # Ass Font Collector (Deprecated for now)
 
 [French README](https://github.com/Hqndler/AssFontCollector/blob/main/README.fr.md)<br><br>
-Personal python solution to extract used font in one or more ass file.
+Personal python solution to check or copy used font in one or more ass file.
 
 ## Requirement 
 
 Python 3.6+ 
 ```
-pip install fontTools tox colorama ass ass_tag_parser tqdm matplotlib
+pip install fontTools colorama ass matplotlib freetype
 ```
 
 ## Usage
 
 Put the script inside the folder where the ass files are.<br>
-Make sure there's only the ass files you want to extract the fonts.<br>
-Launch the script in the terminal and follow the steps. Everything is explained.<br>
-`python ass_font_collector.py`<br>
-The script might not catch all the font used, read what's in the terminal.<br>
+`python ass_font_collector.py --check`<br>
 Done !
 
 ## Things to know
 - The script will by default, copy all the fonts used in each of the ass files, in folders with the same name as the files (without the extension).<br>
-![Proof](https://github.com/Hqndler/AssFontCollector/blob/main/Output%20proof%20for%20ALL_IN_ONE%20False.png)<br>
+![image](https://github.com/Hqndler/AssFontCollector/assets/69089935/407948cc-c13f-41d0-b782-f93d104a94cd)
+
 - You can launch the script with differents arguments if you want :
-- `-warn` to deseable warning, else will print warning message everytime there's a problem<br>
-- `-aio` will copy all the fonts used in each of the ass files within the same folder.<br>
-- `-fontpath "<path>"` to add a folder with fonts that aren't installed.<br>
-- Not giving argument will not change the behevior of the script.
+- `--check` will launch the script directly to check mode.<br>
+- `--copy` will launch the script directly to copy mode.<br>
+- `--aio` will copy all the fonts used in each of the ass files within the same folder.<br>
+- `--path "<path>"` will scan fonts inside the folder path. Useful if the fonts aren't insalled.<br>
+- `-i` / `--input` Alows you to add manualy file or directory as much as you want, only these files will be used.<br>
 - You can also put the script in the path of you're computer to use it anywhere !
 
-Example : `python ass_font_collector.py -aio -warn -fontpath "path/to/folder"`
+Example : `python ass_font_collector.py --check --path "path/to/folder" -i file.ass ../dir/other.ass`
 
-## Disclaimer for aegisub nerd
+## Acknowledgement
 
-- \r tag is not supported, please use real tag that are useful.
-- If you use some kind of modded version of aegisub which handles \b100-\b900 and any fancy stuff like this, the script might not recognize the font.
-
-<!-- ### Recommended -->
-<!-- Put the script in the path to use it anywhere -->
-
-<!-- ## Known Issue -->
-<!-- Fonts collection (.ttc) with languages other than English as the default language can cause problems. <br>-->
-<!-- For example a ttc whose first font name is written in Japanese (can be seen in the font preview or in aegisub) will not be recognized by the script. -->
-<!-- There is definitely a processing order but I don't understand it at the moment. <br>-->
-<!-- Don't worry a message will be displayed if there is any problem during processing.-->
+The script in the version 2.0.0 and above is a rewrite of moi15moi's [FontCollector](https://github.com/moi15moi/FontCollector) (realy great project), why not forking his repo then ? It's a different solution, he uses his own tool, I use mine, but I do recognize that a large part of the code comes from him, in fact the parsing font part is 95% his code. I also don't wanted to install his script I just wanted to have a portable script ("but you can compile it..." yes but I don't want to), in one file witch is annoying for coding but usefull in the other hand. I also wanted some option I found more important than all his mkvpropredit part. I dit the ass parsing part eventhough it's heavily inspired by moi15moi code.<br>
+moi15moi project and mine where different in the beginning but we were all inspired by the one and only WheneverDev's [fontmerge](https://github.com/WheneverDev/fontmerge)

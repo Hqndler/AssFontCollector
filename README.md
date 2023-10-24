@@ -31,7 +31,17 @@ Done !
 
 Example : `python ass_font_collector.py --check --path "path/to/folder" -i file.ass ../dir/other.ass`
 
-## Acknowledgement
+## Origin of the project
 
-The script in the version 2.0.0 and above is a rewrite of moi15moi's [FontCollector](https://github.com/moi15moi/FontCollector) (realy great project), why not forking his repo then ? It's a different solution, he uses his own tool, I use mine, but I do recognize that a large part of the code comes from him, in fact the parsing font part is 95% from his code. I also didn't want to install his script I just wanted to have a portable script ("but you can compile it..." yes but I don't want to), in one file witch is annoying for coding but usefull in the other hand. I also wanted some option I found more important than all his mkvpropredit part. I dit the ass parsing part eventhough it's heavily inspired by moi15moi code.<br>
-moi15moi project and mine were different in the beginning but we were all inspired by the one and only one WheneverDev's [fontmerge](https://github.com/WheneverDev/fontmerge)
+Not wanting to open lots of ASS files to extract the fonts used, I created this script.
+Since version 2.0.0, the script is just a rewrite of the moi15moi project [Fontcollector](https://github.com/moi15moi/FontCollector) (a very good project), why not fork it then? <br>
+It's an alternative solution to his own, he uses his own tools that he developed.<br>
+In this script none of the libraries that moi15moi developed were used. But I recognize that a very large part of the code comes from him, including in particular the part concerning the recovery of font names.<br>
+
+## Proposal
+
+Not wanting to install his script, I opted for a portable solution in a single file ("but you could compile his project and that was it" yes but also no). Looking for another alternative than muxing fonts in an mkv, I added an option to test the availability of fonts and not a simple copy, improved readability etc.<br>
+The script should never crash, do not hesitate to open an issue if it crashes.
+
+## Thanks
+moi15moi's project and mine were different at the beginning but we were both inspired by the one and only WheneverDev [fontmerge](https://github.com/WheneverDev/fontmerge)

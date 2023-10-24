@@ -1,4 +1,4 @@
-# Ass Font Collector (Déconseillé pour l'instant)
+# Ass Font Collector v2
 
 Solution personnelle* pour tester ou copier la disponibilité des polices utilisées dans un ou plusieurs fichier ASS.
 ###### cf [Origine du projet](https://github.com/Hqndler/AssFontCollector/blob/main/README.fr.md#origine-du-projet)

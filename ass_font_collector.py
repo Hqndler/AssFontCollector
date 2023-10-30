@@ -12,7 +12,7 @@ from tempfile import gettempdir
 from matplotlib import font_manager
 import os, shutil, freetype, glob, copy, pickle, ass, base64, sys, time
 
-VERSION = "2.0.1"
+VERSION = "2.0.2"
 
 class InvalidFont(Exception):
     "Raised when a font isn't valid"
@@ -1009,7 +1009,7 @@ def arg_parse():
     parser = ArgumentParser(description = f"ASS Font Collector (v{VERSION})")
     parser.add_argument("--check", required=False, action="store_true", help="Launch the script directly to check mode")
     parser.add_argument("--copy", required=False, action="store_true", help="Launch the script directyl to copy mode")
-    parser.add_argument("--aio", required=False, default=os.getcwd(), help="Copy all the font in the current working directory")
+    parser.add_argument("--aio", required=False, action="store_true", help="Copy all the font in the current working directory")
     parser.add_argument("--path", required=False, type=str, action="store", help="Scan fonts inside the folder path. Useful if the fonts aren't insalled")
     parser.add_argument("--drift", required=False, action="store_true", help="No help will be provieded")
     parser.add_argument("-i", "--input", required=False, nargs="*", action="store", type=str, help="Add manualy file or directory as much as you want, only these files will be used")

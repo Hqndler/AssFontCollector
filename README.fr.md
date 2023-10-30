@@ -6,7 +6,7 @@ Solution personnelle* pour tester ou copier la disponibilité des polices utilis
 ## Avant toute chose assurez vous de bien tout mettre à jour !
 Python 3.6 ou supérieur
 ```
-pip install fontTools colorama ass matplotlib freetype
+pip install fontTools colorama ass matplotlib freetype-py
 ```
 
 ## Comment l'utiliser

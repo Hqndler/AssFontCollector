@@ -8,7 +8,7 @@ Personal* python solution to check or copy used font in one or more ass file.
 
 Python 3.6+ 
 ```
-pip install fontTools colorama ass matplotlib freetype
+pip install fontTools colorama ass matplotlib freetype-py
 ```
 
 ## Usage

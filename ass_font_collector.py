@@ -12,7 +12,7 @@ from tempfile import gettempdir
 from matplotlib import font_manager
 import os, shutil, freetype, glob, copy, pickle, ass, base64, sys, time
 
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 
 class InvalidFont(Exception):
     "Raised when a font isn't valid"
@@ -930,7 +930,7 @@ class Helpers:
 
         for font in font_collection:
             for fam in font.family:
-                if style.fontname in fam.lower():
+                if style.fontname == fam.lower():
                     weight_compare = abs(style.weight - int(font.weight))
                     if (style.weight - font.weight) > 150:
                         weight_compare -= 120

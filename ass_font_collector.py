@@ -12,7 +12,7 @@ from tempfile import gettempdir
 from matplotlib import font_manager
 import os, shutil, freetype, glob, copy, pickle, ass, base64, sys, time
 
-VERSION = "2.0.2"
+VERSION = "2.0.3"
 
 class InvalidFont(Exception):
     "Raised when a font isn't valid"
@@ -185,7 +185,7 @@ class FontInfo:
             
         if self.obj["STAT"].table.AxisValueArray is not None:
             for axis_value in self.obj["STAT"].table.AxisValueArray.AxisValue:
-                if axis_value.Format >= 1 or axis_value.Format <= 4:
+                if axis_value.Format >= 1 and axis_value.Format <= 4:
                     if axis_value.Format == 4 and len(axis_value.AxisValueRecord) == 0:
                         return False
                 else:

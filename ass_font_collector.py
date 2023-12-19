@@ -12,7 +12,7 @@ from tempfile import gettempdir
 from matplotlib import font_manager
 import os, shutil, freetype, glob, copy, pickle, ass, base64, sys, time
 
-VERSION = "2.0.3"
+VERSION = "2.0.4"
 
 class InvalidFont(Exception):
     "Raised when a font isn't valid"
@@ -206,7 +206,7 @@ class FontInfo:
                 self.exact_names.add(postscript_name)
 
     def __str__(self) -> str:
-        return f"Path : {self.path}\n\t\tFamily names : {self.family}\n\t\tFull Name : {self.fullname}\n\t\tExact Name : {self.exact_names}\n\t\tWeight : {self.weight} Italic : {self.italic}\n"
+        return f"Path : {self.path}\n\t\tFamily names : {self.family}\n\t\tWeight : {self.weight} Italic : {self.italic}\n" #Full Name : {self.fullname}\n\t\tExact Name : {self.exact_names}\n\t\t
 
     @staticmethod
     def get_name_encoding(name: NameRecord) -> Optional[str]:
@@ -598,7 +598,7 @@ class Tag:
         self.weight : int = 0
 
     def __str__(self) -> str:
-        return f"override raw : '{self.raw}', valid : {self.valid}, val : {self.value}, weight : {self.weight}"
+        return f"override raw : '{self.raw}', valid : {self.valid}\t, val : {self.value}, weight : {self.weight}"
 
 class TagParser:
 
@@ -832,7 +832,7 @@ class AssDoc:
 
     def insideof(self) -> bool:
         for style in self.used_styles:
-            if style.fontname == self.current_style.fontname and style.weight == self.current_style.weight:
+            if style.fontname == self.current_style.fontname and style.weight == self.current_style.weight and style.italic == self.current_style.italic:
                 if self.current_style.italic:
                     style.italic = True
                 return True
@@ -840,7 +840,7 @@ class AssDoc:
 
     def update(self, index : int) -> None:
         for style in self.used_styles:
-            if style.fontname == self.current_style.fontname and style.weight == self.current_style.weight:
+            if style.fontname == self.current_style.fontname and style.weight == self.current_style.weight and style.italic == self.current_style.italic:
                 usage = self.used_styles.get(style)
                 if usage is None:
                     usage = UsageData(set([index]))
@@ -864,6 +864,8 @@ class AssDoc:
 
                 if override.raw == "i" and override.valid:
                     self.current_style.italic = True
+                elif override.raw == 'i' and not override.valid:
+                    self.current_style.italic = False
 
                 if override.raw == "fn":
                     if override.valid:
@@ -901,6 +903,7 @@ class AssDoc:
                 self.line_style = AssStyle(self.og_style.fontname, self.og_style.untouched, self.og_style.weight, self.og_style.italic)
                 self.current_style = AssStyle(self.og_style.fontname, self.og_style.untouched, self.og_style.weight, self.og_style.italic)
                 self.set_used_style(i + 1, tags)
+        [print(i) for i in self.used_styles]
         return self.used_styles
 
     def from_file(self, path):
@@ -953,7 +956,7 @@ class Helpers:
     def copy_font(fonts : List[FontInfo], aio : bool, ass_path):
         dir : str = os.getcwd()
         if not aio:
-            dir = os.path.join(os.path.dirname(ass_path) + os.path.basename(ass_path[:-4]))
+            dir = os.path.join(os.path.dirname(ass_path), os.path.basename(ass_path[:-4]))
 
         if not os.path.exists(dir):
             os.mkdir(dir)
@@ -1038,7 +1041,7 @@ def arg_parse():
         for path in args.input:
             if os.path.isfile(path) and path.endswith(".ass"):
                 input.append(os.path.abspath(path))
-            if os.path.isdir(path):
+            elif os.path.isdir(path):
                 path = os.path.abspath(path)
                 print(f"\"{path}\" is a directory, collecting every ass file inside")
                 dir = os.listdir(path)

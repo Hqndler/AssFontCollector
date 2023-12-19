@@ -903,7 +903,6 @@ class AssDoc:
                 self.line_style = AssStyle(self.og_style.fontname, self.og_style.untouched, self.og_style.weight, self.og_style.italic)
                 self.current_style = AssStyle(self.og_style.fontname, self.og_style.untouched, self.og_style.weight, self.og_style.italic)
                 self.set_used_style(i + 1, tags)
-        [print(i) for i in self.used_styles]
         return self.used_styles
 
     def from_file(self, path):

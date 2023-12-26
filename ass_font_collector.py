@@ -12,7 +12,7 @@ from tempfile import gettempdir
 from matplotlib import font_manager
 import os, shutil, freetype, glob, copy, pickle, ass, base64, sys, time
 
-VERSION = "2.0.4"
+VERSION = "2.0.5"
 
 class InvalidFont(Exception):
     "Raised when a font isn't valid"
@@ -883,6 +883,13 @@ class AssDoc:
             #today in this cpp class we will talk about internal pointer : the line above is obsure but let me explain you (yes it's python code but it's also a meme)
             #the line simply make a true copy of current_style in current_style. Why ?
             #Because if we don't do that the pointer don't change and thus will update the previous current_style with the actual current_style
+        else:
+            if self.insideof():
+                self.update(index)
+            else:
+                usage_data = UsageData(set([index]))
+                self.used_styles[self.current_style] = usage_data
+
 
     def get_used_style(self) -> Dict[AssStyle, UsageData]:
         self.used_styles : Dict[AssStyle, UsageData] = dict()
@@ -1054,6 +1061,7 @@ def arg_parse():
     return (args.check, args.copy, args.aio, args.path, input)
 
 def main():
+    print(f"You are using AssFontCollector v{VERSION}")
     g_check, g_copy, g_aio, g_path, g_input = arg_parse()
     if not g_check and not g_copy:
         g_check, g_copy = ask_mode()

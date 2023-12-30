@@ -12,7 +12,7 @@ from tempfile import gettempdir
 from matplotlib import font_manager
 import os, shutil, freetype, glob, copy, pickle, ass, base64, sys, time
 
-VERSION = "2.0.5"
+VERSION = "2.0.6"
 
 class InvalidFont(Exception):
     "Raised when a font isn't valid"
@@ -1071,7 +1071,6 @@ def main():
         print("No ass files found.\nexit")
         return
 
-    font_result : List[FontResult] = list()
     print("Grabing installed fonts...")
     font_collection = FontLoader(g_path).fonts()
     print(Fore.GREEN + "Done\n" + Style.RESET_ALL)
@@ -1083,6 +1082,7 @@ def main():
 
         not_found : Set[str] = set()
 
+        font_result : List[FontResult] = list()
         for style, usage in styles.items():
             result = Helpers.get_used_font_by_style(font_collection, style)
 

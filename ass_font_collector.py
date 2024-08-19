@@ -12,7 +12,7 @@ from tempfile import gettempdir
 from matplotlib import font_manager
 import os, shutil, freetype, glob, copy, pickle, ass, base64, sys, time
 
-VERSION = "2.0.6"
+VERSION = "2.0.7"
 
 class InvalidFont(Exception):
     "Raised when a font isn't valid"
@@ -196,12 +196,12 @@ class FontInfo:
         try:
             postscript_name_byte = freetype.Face(Path(self.path).open("rb"), self.index).postscript_name
         except OSError:
-            print(Fore.RED + f"Error with {self.path}, please call moi15moi and say that this font has not been decoded, sorry I tried *sobbing*" + Style.RESET_ALL)
+            print(Fore.RED + f"Error with {self.path}, please call [REDACTED] and say that this font has not been decoded, sorry I tried *sobbing*" + Style.RESET_ALL)
         if postscript_name_byte is not None:
             try:
                 postscript_name = postscript_name_byte.decode("ASCII")
             except UnicodeDecodeError:
-                print(Fore.RED + f"Error with {self.path}, please call moi15moi and say that this font has not been decoded, sorry I tried *sobbing*" + Style.RESET_ALL)
+                print(Fore.RED + f"Error with {self.path}, please call [REDACTED] and say that this font has not been decoded, sorry I tried *sobbing*" + Style.RESET_ALL)
             if postscript_name is not None:
                 self.exact_names.add(postscript_name)
 
@@ -616,7 +616,7 @@ class TagParser:
             tag = Tag()
             tag.raw = "fn"
             if len(override) - 2 > 0:
-                tag.value = override[2:]
+                tag.value = override[2:].strip()
                 tag.valid = True
                 self.orderedtag.append(tag)
                 return
